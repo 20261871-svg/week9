@@ -1,0 +1,84 @@
+#include <iostream>
+using namespace std;
+
+// 최대공약수(GCD) 계산 함수 (유클리드 호제법)
+long long gcd(long long a, long long b) {
+    // 음수인 경우 절대값으로 변환
+    if (a < 0) a = -a;
+    if (b < 0) b = -b;
+    
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+
+class Fraction {
+private:
+    long long num, den; // num: 분자, den: 분모
+    
+    void reduce() {
+        long long g = gcd(num, den);
+        num /= g;
+        den /= g;
+        
+        // 분모에 음수가 들어가지 않도록 처리
+        if (den < 0) {
+            num = -num;
+            den = -den;
+        }
+    }
+
+public:
+    Fraction(long long num, long long den) {
+        this->num = num;
+        this->den = den;
+        reduce(); // 생성 시 바로 약분 호출
+    }
+    
+    Fraction add(Fraction other) {
+        long long newNum = (num * other.den) + (other.num * den);
+        long long newDen = den * other.den;
+        return Fraction(newNum, newDen);
+    }
+    
+    Fraction mul(Fraction other) {
+        long long newNum = num * other.num;
+        long long newDen = den * other.den;
+        return Fraction(newNum, newDen);
+    }
+    
+    void print() {
+        if (den == 1) {
+            cout << num;
+        } else {
+            cout << num << "/" << den;
+        }
+    }
+};
+
+int main() {
+    int N;
+    cout << "N을 입력하세요: ";
+    cin >> N;
+
+    // (1) 1/1 + 1/2 + ... + 1/N
+    Fraction sum(0, 1);
+    for (int i = 1; i <= N; ++i) {
+        sum = sum.add(Fraction(1, i));
+    }
+    
+    cout << "(1):";
+    sum.print();
+    cout << endl;
+
+    // (2) (1 + 1/1)(1 + 1/2)...(1 + 1/N)
+    Fraction prod(1, 1);
+    for (int i = 1; i <= N; ++i) {
+        prod = prod.mul(Fraction(i + 1, i)); // 1 + 1/i 는 (i+1)/i 와 동일함
+    }
+    
+    cout << "(2):";
+    prod.print();
+    cout << endl;
+
+    return 0;
+}
